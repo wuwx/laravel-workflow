@@ -1,0 +1,42 @@
+{
+    "name": "wuwx/laravel-workflow",
+    "type": "library",
+    "keywords": ["laravel", "workflow"],
+    "description": "",
+    "authors": [
+        {
+            "name": "Wu Weixin",
+            "email": "wuweixin@gmail.com"
+        }
+    ],
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Wuwx\\LaravelWorkflow\\": "src/"
+        },
+        "files": [
+            "src/helpers.php"
+        ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Wuwx\\LaravelWorkflow\\Tests\\": "tests/"
+        }
+    },
+    "require": {
+        "alom/graphviz": "^1.1",
+        "illuminate/support": "^5.5",
+        "symfony/expression-language": "^4.1",
+        "symfony/workflow": "^4.1"
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Wuwx\\LaravelWorkflow\\Providers\\WorkflowServiceProvider"
+            ],
+            "aliases": {
+                "Workflow": "Wuwx\\LaravelWorkflow\\Facades\\WorkflowFacade"
+            }
+        }
+    }
+}
