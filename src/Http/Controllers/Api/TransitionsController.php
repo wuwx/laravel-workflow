@@ -6,8 +6,6 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
 
-use Wuwx\LaravelWorkflow\Entities\Workflow;
-
 class TransitionsController extends Controller
 {
     public function index(Request $request)
@@ -19,15 +17,14 @@ class TransitionsController extends Controller
         #TODO: fixit later;
         $subject = app()->make($subject_type)->find($subject_id);
 
-        $transitions = collect(app('workflow.registry')->get($subject, $workflow_name)->getEnabledTransitions($subject))->map(function($transition) use ($workflow_name){
-            $workflow = Workflow::whereName($workflow_name)->first();
-            $transition = $workflow->transitions()->whereName($transition->getName())->first();
+        $workflow = app('workflow.registry')->get($subject, $workflow_name);
+        $transitions = collect($workflow->getEnabledTransitions($subject));
 
+        return response()->json($transitions->map(function($transition) use ($workflow) {
             return [
-                'name' => $transition->name,
-                'title' => $transition->title,
+                'name' => $transition->getName(),
+                'title' => array_get($workflow->getMetadataStore()->getTransitionMetadata($transition), 'title'),
             ];
-        });
-        return response()->json($transitions);
+        }));
     }
 }

@@ -8,9 +8,9 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Request;
-use ExpressionLanguage;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use ExpressionLanguage;
 use Wuwx\LaravelWorkflow\Entities\Workflow;
 use Wuwx\LaravelWorkflow\Entities\Place;
 use Wuwx\LaravelWorkflow\Entities\Transition;
@@ -92,25 +92,25 @@ class WorkflowSubscriber implements EventSubscriberInterface
     {
         event(new AnnounceEvent);
         $subject = $event->getSubject();
+        $workflow = $event->getWorkflow();
+        $transition = $event->getTransition();
 
         // Process Notifications;
-        foreach($subject->workflow->notifications as $notification) {
+        foreach(array_get($workflow->getMetadataStore()->getWorkflowMetadata(), 'notifications', []) as $notification) {
             $notifiables = ExpressionLanguage::evaluate($notification->notifiables, compact('subject'));
             Notification::sendNow($notifiables, new $notification->name, $notification->channels);
         }
 
         // Transition Notifications
-        $transition = $subject->workflow->transitions()->whereName($event->getTransition()->getName())->first();
-
-        foreach($transition->notifications as $notification) {
+        foreach(array_get($workflow->getMetadataStore()->getTransitionMetadata($transition), 'notifications', []) as $notification) {
             $notifiables = ExpressionLanguage::evaluate($notification->notifiables, compact('subject'));
             Notification::sendNow($notifiables, new $notification->name, $notification->channels);
         }
 
-        foreach (app('workflow.registry')->get($subject, $subject->workflow->name)->getEnabledTransitions($subject) as $transition) {
-            if (ExpressionLanguage::evaluate($subject->workflow->transitions()->whereName($transition->getName())->first()->automatic, compact('subject')) === true) {
+        foreach ($workflow->getEnabledTransitions($subject) as $transition) {
+            if (ExpressionLanguage::evaluate(array_get($workflow->getMetadataStore()->getTransitionMetadata($transition), 'automatic'), compact('subject')) === true) {
                 #TODO: 自动执行的时候，可能需要无视权限
-                app('workflow.registry')->get($subject, $subject->workflow->name)->apply($subject, $transition->getName());
+                $workflow->apply($subject, $transition->getName());
                 $subject->save();
                 break;
             }

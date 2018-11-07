@@ -35,7 +35,7 @@ class WorkflowServiceProvider extends ServiceProvider
 
         if ($this->app->runningInConsole()) {
             $this->publishes([
-                __DIR__.'/../../resources/assets/js/components' => base_path('resources/assets/js/components/workflow'),
+                __DIR__.'/../../resources/js/components' => base_path('resources/js/components/workflow'),
             ], 'workflow-components');
 
             $this->commands([

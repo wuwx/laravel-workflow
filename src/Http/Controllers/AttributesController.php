@@ -21,23 +21,31 @@ class AttributesController extends Controller
      */
     public function index(Request $request)
     {
-        $subject_id      = $request->subject_id;
-        $subject_type    = $request->subject_type;
-        $workflow_name   = $request->workflow_name;
-        $transition_name = $request->transition_name;
+        $subject_id     = $request->subject_id;
+        $subject_type   = $request->subject_type;
+        $workflow_name  = $request->workflow_name;
+        $transitionName = $request->transition_name;
 
-        $transition = Transition::where('name', $transition_name)->first();
+        $subject = app()->make($subject_type)->find($subject_id);
+        $workflow = app('workflow.registry')->get($subject, $workflow_name);
+
+        foreach($workflow->getDefinition()->getTransitions() as $transition) {
+            if ($transition->getName() == $transitionName) {
+                break;
+            }
+        }
 
         $subject = app()->make($subject_type)->find($subject_id);
         //$subject = $subject->subjects()->first();
 
         $form = FormBuilder::plain();
         $current_user = $request->user();
-        foreach($transition->attributes as $attribute) {
+        $attributes = array_get($workflow->getMetadataStore()->getTransitionMetadata($transition), 'attributes', []);
+        foreach($attributes as $attribute) {
             $options = ExpressionLanguage::evaluate($attribute->options, compact('subject', 'current_user'));
             $form->add($attribute->name, $attribute->type, collect($options)->toArray());
         }
 
-        return view('workflow::attributes.index', compact('form', 'transition'));
+        return view('workflow::attributes.index', compact('form', 'attributes'));
     }
 }

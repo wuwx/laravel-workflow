@@ -14,22 +14,28 @@ class ApplyController extends Controller
     public function __invoke(Request $request)
     {
         #TODO: 最好放在一个事务里，否则有问题
-        $subject_id      = $request->subject_id;
-        $subject_type    = $request->subject_type;
-        $workflow_name   = $request->workflow_name;
-        $transition_name = $request->transition_name;
+        $subject_id     = $request->subject_id;
+        $subject_type   = $request->subject_type;
+        $workflow_name  = $request->workflow_name;
+        $transitionName = $request->transition_name;
 
         #TODO: fixit later;
         $subject = app()->make($subject_type)->find($subject_id);
         #TODO: 还需要针对版本
-        $transition = Transition::whereName($transition_name)->first();
+        $workflow = app('workflow.registry')->get($subject, $workflow_name);
 
         try {
             #TODO: 应该先保存属性再保存工作流
-            Workflow::get($subject, $workflow_name)->apply($subject, $transition_name);
+            $workflow->apply($subject, $transitionName);
             $subject->save();
 
-            foreach(collect($transition->attributes) as $attribute) {
+            foreach($workflow->getDefinition()->getTransitions() as $transition) {
+                if ($transition->getName() == $transitionName) {
+                    break;
+                }
+            }
+
+            foreach(array_get($workflow->getMetadataStore()->getTransitionMetadata($transition), 'attributes', []) as $attribute) {
                 if (array_has($subject->getAttributes(), $attribute->name)) {
                     if ($attribute->type == 'file') {
                         if ($request->hasFile($attribute->name)) {
