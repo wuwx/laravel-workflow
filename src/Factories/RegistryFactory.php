@@ -60,7 +60,7 @@ class RegistryFactory
             }
         }
 
-        foreach(app('config')->get('workflow.workflows') as $name => $workflow) {
+        foreach(app('config')->get('workflow.workflows', []) as $name => $workflow) {
             $workflowMetadata = array_get($workflow, 'metadata', []);
             $placesMetadata = [];
             $transitionsMetadata = new \SplObjectStorage();
