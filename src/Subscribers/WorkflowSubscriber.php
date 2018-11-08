@@ -79,6 +79,8 @@ class WorkflowSubscriber implements EventSubscriberInterface
             $history->user_id = Auth::id();
             $history->content = Request::input('content');
             $history->save();
+        } else {
+            $workflow = $event->getWorkflow();
         }
 
     }
