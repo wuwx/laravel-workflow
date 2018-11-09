@@ -16,6 +16,9 @@ class CreateWorkflowHistoriesTable extends Migration
         Schema::create('workflow_histories', function (Blueprint $table) {
             $table->increments('id');
             $table->morphs('subject');
+            $table->string('workflow_name');
+            $table->string('transition_name');
+
             $table->integer('transition_id')->nullable();
             $table->integer('place_id')->nullable();
             $table->integer('user_id')->nullable();

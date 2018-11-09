@@ -18,7 +18,7 @@ class HistoryController extends Controller
         $subject = app()->make($subject_type)->find($subject_id);
 
         $workflow = app('workflow.registry')->get($subject, $workflow_name);
-        $histories = $subject->histories()->paginate();
+        $histories = $subject->histories;
 
         return response()->json($histories);
     }

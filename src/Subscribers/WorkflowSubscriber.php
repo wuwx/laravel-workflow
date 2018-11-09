@@ -80,7 +80,10 @@ class WorkflowSubscriber implements EventSubscriberInterface
             $history->content = Request::input('content');
             $history->save();
         } else {
-            $workflow = $event->getWorkflow();
+            $history = $subject->histories()->make();
+            $history->workflow_name = $event->getWorkflowName();
+            $history->transition_name = $event->getTransition()->getName();
+            $history->save();
         }
 
     }
