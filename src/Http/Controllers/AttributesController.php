@@ -42,8 +42,8 @@ class AttributesController extends Controller
         $current_user = $request->user();
         $attributes = array_get($workflow->getMetadataStore()->getTransitionMetadata($transition), 'attributes', []);
         foreach($attributes as $attribute) {
-            $options = ExpressionLanguage::evaluate($attribute->options, compact('subject', 'current_user'));
-            $form->add($attribute->name, $attribute->type, collect($options)->toArray());
+            $options = ExpressionLanguage::evaluate(array_get($attribute, 'options'), compact('subject', 'current_user'));
+            $form->add(array_get($attribute, 'name'), array_get($attribute, 'type'), collect($options)->toArray());
         }
 
         return view('workflow::attributes.index', compact('form', 'attributes'));

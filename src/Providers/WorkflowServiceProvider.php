@@ -2,6 +2,7 @@
 
 namespace Wuwx\LaravelWorkflow\Providers;
 
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Database\Eloquent\Factory;
@@ -41,6 +42,7 @@ class WorkflowServiceProvider extends ServiceProvider
             $this->commands([
                 'Wuwx\LaravelWorkflow\Console\ListCommand',
                 'Wuwx\LaravelWorkflow\Console\InfoCommand',
+                'Wuwx\LaravelWorkflow\Console\DumpCommand',
             ]);
         }
     }
@@ -52,6 +54,12 @@ class WorkflowServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        Blueprint::macro("workflow", function() {
+            $this->string('workflow_name')->nullable();
+            $this->string('workflow_marking')->nullable();
+            $this->string('workflow_version')->nullable();
+        });
+
         $this->app->singleton('workflow.registry', function ($app) {
             return RegistryFactory::make();
         });

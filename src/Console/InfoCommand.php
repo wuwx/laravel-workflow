@@ -6,7 +6,6 @@ use Illuminate\Console\Command;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 use Wuwx\LaravelWorkflow\Factories\RegistryFactory;
-use Wuwx\LaravelWorkflow\Entities\Subject;
 
 class InfoCommand extends Command
 {
@@ -23,24 +22,32 @@ class InfoCommand extends Command
     public function handle()
     {
         $name = $this->argument('name');
-        $registry = RegistryFactory::make();
-        $workflow = $registry->get(new Subject(), $name);
+        $registry = app('workflow.registry');
 
-        $this->table(['name', 'title'], array_map(function($place) use ($workflow) {
-            return [
-                $place,
-                array_get($workflow->getMetadataStore()->getPlaceMetadata($place), 'title'),
-            ];
-        }, $workflow->getDefinition()->getPlaces()));
+        $workflows = (function(){
+            return $this->workflows;
+        })->call($registry);
 
-        $this->table(['name', 'title', 'froms', 'tos'], array_map(function($transition) use ($workflow) {
-            return [
-                $transition->getName(),
-                array_get($workflow->getMetadataStore()->getTransitionMetadata($transition), 'title'),
-                json_encode($transition->getFroms()),
-                json_encode($transition->getTos())
-            ];
-        }, $workflow->getDefinition()->getTransitions()));
+        foreach($workflows as list($workflow, $supportStrategy)) {
+            if ($workflow->getName() == $name) {
+                $this->table(['name', 'title'], array_map(function($place) use ($workflow) {
+                    return [
+                        $place,
+                        array_get($workflow->getMetadataStore()->getPlaceMetadata($place), 'title'),
+                    ];
+                }, $workflow->getDefinition()->getPlaces()));
+
+                $this->table(['name', 'title', 'froms', 'tos'], array_map(function($transition) use ($workflow) {
+                    return [
+                        $transition->getName(),
+                        array_get($workflow->getMetadataStore()->getTransitionMetadata($transition), 'title'),
+                        json_encode($transition->getFroms()),
+                        json_encode($transition->getTos())
+                    ];
+                }, $workflow->getDefinition()->getTransitions()));
+                break;
+            }
+        }
     }
 
     protected function getArguments()

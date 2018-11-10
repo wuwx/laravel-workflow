@@ -1,6 +1,7 @@
 <?php
 namespace Wuwx\LaravelWorkflow\Factories;
 
+use Illuminate\Database\Eloquent\Model;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Workflow\Registry;
@@ -55,9 +56,11 @@ class RegistryFactory
             $definition = $builder->build();
             $markingStoreArguments = array_get($workflow, 'marking_store.arguments', []);
             $markingStore = new SingleStateMarkingStore(...$markingStoreArguments);
-            foreach(array_wrap($workflow->supports) as $support) {
-                $registry->addWorkflow(new \Symfony\Component\Workflow\Workflow($definition, $markingStore, $eventDispatcher, $name), new InstanceOfSupportStrategy($support));
-            }
+
+            $registry->addWorkflow(new \Symfony\Component\Workflow\Workflow($definition, $markingStore, $eventDispatcher, $name), new InstanceOfSupportStrategy(Model::class));
+            //foreach(array_wrap($workflow->supports) as $support) {
+            //    $registry->addWorkflow(new \Symfony\Component\Workflow\Workflow($definition, $markingStore, $eventDispatcher, $name), new InstanceOfSupportStrategy($support));
+            //}
         }
 
         foreach(app('config')->get('workflow.workflows', []) as $name => $workflow) {
@@ -104,9 +107,10 @@ class RegistryFactory
                     break;
             }
 
-            foreach($workflow['supports'] as $support) {
-                $registry->addWorkflow(new \Symfony\Component\Workflow\Workflow($definition, $markingStore, $eventDispatcher, $name), new InstanceOfSupportStrategy($support));
-            }
+            $registry->addWorkflow(new \Symfony\Component\Workflow\Workflow($definition, $markingStore, $eventDispatcher, $name), new InstanceOfSupportStrategy(Model::class));
+            //foreach($workflow['supports'] as $support) {
+            //    $registry->addWorkflow(new \Symfony\Component\Workflow\Workflow($definition, $markingStore, $eventDispatcher, $name), new InstanceOfSupportStrategy($support));
+            //}
         }
 
         return $registry;

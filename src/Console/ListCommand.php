@@ -20,13 +20,13 @@ class ListCommand extends Command
 
     public function handle()
     {
-        $registry = RegistryFactory::make();
+        $registry = app('workflow.registry');
 
         $workflows = (function(){
             return $this->workflows;
         })->call($registry);
 
-        $this->table(['workflow', '', 'supportStrategy', 'initial_place'], array_map(function($value) {
+        $this->table(['name', 'title', 'supportStrategy', 'initial_place'], array_map(function($value) {
             list($workflow, $supportStrategy) = $value;
             return [
                 $workflow->getName(),
