@@ -29,7 +29,14 @@ class WorkflowSubscriber implements EventSubscriberInterface
 
     public function onGuard($event)
     {
-        event(new GuardEvent);
+        $workflowName   = $event->getWorkflowName();
+        $transitionName = $event->getTransition()->getName();
+
+        event(new GuardEvent($event));
+        event('workflow.guard', $event);
+        event(sprintf('workflow.%s.guard', $workflowName), $event);
+        event(sprintf('workflow.%s.guard.%s', $workflowName, $transitionName), $event);
+
         $subject = $event->getSubject();
 
         if ($workflow = Workflow::whereName($event->getWorkflowName())->first()) {
@@ -52,22 +59,56 @@ class WorkflowSubscriber implements EventSubscriberInterface
 
     public function onLeave($event)
     {
-        event(new LeaveEvent);
+        $places       = $event->getTransition()->getFroms();
+        $workflowName = $event->getWorkflowName();
+
+        event(new LeaveEvent($event));
+        event('workflow.leave', $event);
+        event(sprintf('workflow.%s.leave', $workflowName), $event);
+
+        foreach ($places as $place) {
+            event(sprintf('workflow.%s.leave.%s', $workflowName, $place), $event);
+        }
     }
 
     public function onTransition($event)
     {
-        event(new TransitionEvent);
+        $workflowName   = $event->getWorkflowName();
+        $transitionName = $event->getTransition()->getName();
+
+        event(new TransitionEvent($event));
+        event('workflow.transition', $event);
+        event(sprintf('workflow.%s.transition', $workflowName), $event);
+        event(sprintf('workflow.%s.transition.%s', $workflowName, $transitionName), $event);
     }
 
     public function onEnter($event)
     {
-        event(new EnterEvent);
+        $places       = $event->getTransition()->getTos();
+        $workflowName = $event->getWorkflowName();
+
+        event(new EnterEvent($event));
+        event('workflow.enter', $event);
+        event(sprintf('workflow.%s.enter', $workflowName), $event);
+
+        foreach ($places as $place) {
+            event(sprintf('workflow.%s.enter.%s', $workflowName, $place), $event);
+        }
     }
 
     public function onEntered($event)
     {
-        event(new EnteredEvent);
+        $places       = $event->getTransition()->getTos();
+        $workflowName = $event->getWorkflowName();
+
+        event(new EnteredEvent($event));
+        event('workflow.entered', $event);
+        event(sprintf('workflow.%s.entered', $workflowName), $event);
+
+        foreach ($places as $place) {
+            event(sprintf('workflow.%s.entered.%s', $workflowName, $place), $event);
+        }
+
         $subject = $event->getSubject();
         if ($workflow = Workflow::whereName($event->getWorkflowName())->first()) {
             $place = $workflow->places()->whereIn('name', array_keys($event->getMarking()->getPlaces()))->first();
@@ -90,12 +131,28 @@ class WorkflowSubscriber implements EventSubscriberInterface
 
     public function onCompleted($event)
     {
-        event(new CompletedEvent);
+        $workflowName   = $event->getWorkflowName();
+        $transitionName = $event->getTransition()->getName();
+
+        event(new CompletedEvent($event));
+        event('workflow.completed', $event);
+        event(sprintf('workflow.%s.completed', $workflowName), $event);
+        event(sprintf('workflow.%s.completed.%s', $workflowName, $transitionName), $event);
     }
 
     public function onAnnounce($event)
     {
-        event(new AnnounceEvent);
+        $workflowName   = $event->getWorkflowName();
+
+        event(new AnnounceEvent($event));
+        event('workflow.announce', $event);
+        event(sprintf('workflow.%s.announce', $workflowName), $event);
+
+        $subject = $event->getSubject();
+        foreach ($event->getWorkflow()->getEnabledTransitions($subject) as $transition) {
+            event(sprintf('workflow.%s.announce.%s', $workflowName, $transition->getName()), $event);
+        }
+
         $subject = $event->getSubject();
         $workflow = $event->getWorkflow();
         $transition = $event->getTransition();
