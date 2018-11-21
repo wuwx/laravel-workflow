@@ -9,6 +9,10 @@ class History extends Model
 {
     protected $table = "workflow_histories";
     protected $fillable = [];
+    protected $casts = [
+        'transition_froms' => 'array',
+        'transition_tos' => 'array',
+    ];
 
     public function subject()
     {

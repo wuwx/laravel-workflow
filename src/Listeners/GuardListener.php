@@ -6,7 +6,6 @@ use Bouncer;
 use ExpressionLanguage;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Wuwx\LaravelExpressionLanguage\Facades\ExpressionLanguageFacade;
 use Wuwx\LaravelWorkflow\Entities\Workflow;
 
 class GuardListener

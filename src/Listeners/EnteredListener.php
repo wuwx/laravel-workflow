@@ -28,23 +28,19 @@ class EnteredListener
      */
     public function handle($event)
     {
-        $subject = $event->getSubject();
+        $subject    = $event->getSubject();
+        $workflow   = $event->getWorkflow();
+        $transition = $event->getTransition();
 
-        if ($workflow = Workflow::whereName($event->getWorkflowName())->first()) {
-            $place = $workflow->places()->whereIn('name', array_keys($event->getMarking()->getPlaces()))->first();
-            $transition = $workflow->transitions()->whereName($event->getTransition()->getName())->first();
+        $history = $subject->histories()->make();
+        $history->workflow_name = $event->getWorkflowName();
+        $history->transition_name = $transition->getName();
+        $history->transition_froms = $transition->getFroms();
+        $history->transition_tos = $transition->getTos();
 
-            $history = $subject->histories()->make();
-            $history->transition_id = $transition->id;
-            $history->place_id = $place->id;
-            $history->user_id = Auth::id();
-            $history->content = Request::input('content');
-            $history->save();
-        } else {
-            $history = $subject->histories()->make();
-            $history->workflow_name = $event->getWorkflowName();
-            $history->transition_name = $event->getTransition()->getName();
-            $history->save();
-        }
+        $history->content = Request::input('content');
+        $history->user_id = Auth::id();
+
+        $history->save();
     }
 }

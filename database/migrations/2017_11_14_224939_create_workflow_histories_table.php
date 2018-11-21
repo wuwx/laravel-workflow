@@ -18,9 +18,8 @@ class CreateWorkflowHistoriesTable extends Migration
             $table->morphs('subject');
             $table->string('workflow_name');
             $table->string('transition_name');
-
-            $table->integer('transition_id')->nullable();
-            $table->integer('place_id')->nullable();
+            $table->string('transition_froms')->nullable();
+            $table->string('transition_tos')->nullable();
             $table->integer('user_id')->nullable();
             $table->text('content')->nullable();
             $table->timestamps();

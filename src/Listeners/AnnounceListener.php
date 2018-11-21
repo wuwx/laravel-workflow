@@ -27,8 +27,8 @@ class AnnounceListener
      */
     public function handle($event)
     {
-        $subject = $event->getSubject();
-        $workflow = $event->getWorkflow();
+        $subject    = $event->getSubject();
+        $workflow   = $event->getWorkflow();
         $transition = $event->getTransition();
 
         // Process Notifications;

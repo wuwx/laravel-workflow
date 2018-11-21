@@ -2,16 +2,9 @@
 
 namespace Wuwx\LaravelWorkflow\Subscribers;
 
-use Bouncer;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Notification;
-use Illuminate\Support\Facades\Request;
-
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use ExpressionLanguage;
-
 use Wuwx\LaravelWorkflow\Events\GuardEvent;
 use Wuwx\LaravelWorkflow\Events\LeaveEvent;
 use Wuwx\LaravelWorkflow\Events\TransitionEvent;
