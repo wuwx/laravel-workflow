@@ -11,10 +11,6 @@ use Illuminate\Support\Facades\Request;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use ExpressionLanguage;
-use Wuwx\LaravelWorkflow\Entities\Workflow;
-use Wuwx\LaravelWorkflow\Entities\Place;
-use Wuwx\LaravelWorkflow\Entities\Transition;
-use Wuwx\LaravelWorkflow\Entities\History;
 
 use Wuwx\LaravelWorkflow\Events\GuardEvent;
 use Wuwx\LaravelWorkflow\Events\LeaveEvent;
@@ -36,25 +32,6 @@ class WorkflowSubscriber implements EventSubscriberInterface
         event('workflow.guard', $event);
         event(sprintf('workflow.%s.guard', $workflowName), $event);
         event(sprintf('workflow.%s.guard.%s', $workflowName, $transitionName), $event);
-
-        $subject = $event->getSubject();
-
-        if ($workflow = Workflow::whereName($event->getWorkflowName())->first()) {
-
-            $transition = $workflow->transitions()->whereName($event->getTransition()->getName())->first();
-
-            if ($event->getTransition()->getName() == 'start') {
-                return;
-            }
-
-            if (!empty($transition->guard) && ExpressionLanguage::evaluate($transition->guard, compact('subject')) !== false) {
-                $event->setBlocked(true);
-            }
-
-            if (!Bouncer::allows('apply', $transition)) {
-                $event->setBlocked(true);
-            }
-        }
     }
 
     public function onLeave($event)
@@ -108,25 +85,6 @@ class WorkflowSubscriber implements EventSubscriberInterface
         foreach ($places as $place) {
             event(sprintf('workflow.%s.entered.%s', $workflowName, $place), $event);
         }
-
-        $subject = $event->getSubject();
-        if ($workflow = Workflow::whereName($event->getWorkflowName())->first()) {
-            $place = $workflow->places()->whereIn('name', array_keys($event->getMarking()->getPlaces()))->first();
-            $transition = $workflow->transitions()->whereName($event->getTransition()->getName())->first();
-
-            $history = $subject->histories()->make();
-            $history->transition_id = $transition->id;
-            $history->place_id = $place->id;
-            $history->user_id = Auth::id();
-            $history->content = Request::input('content');
-            $history->save();
-        } else {
-            $history = $subject->histories()->make();
-            $history->workflow_name = $event->getWorkflowName();
-            $history->transition_name = $event->getTransition()->getName();
-            $history->save();
-        }
-
     }
 
     public function onCompleted($event)
@@ -142,40 +100,15 @@ class WorkflowSubscriber implements EventSubscriberInterface
 
     public function onAnnounce($event)
     {
-        $workflowName   = $event->getWorkflowName();
+        $subject      = $event->getSubject();
+        $workflowName = $event->getWorkflowName();
 
         event(new AnnounceEvent($event));
         event('workflow.announce', $event);
         event(sprintf('workflow.%s.announce', $workflowName), $event);
 
-        $subject = $event->getSubject();
         foreach ($event->getWorkflow()->getEnabledTransitions($subject) as $transition) {
             event(sprintf('workflow.%s.announce.%s', $workflowName, $transition->getName()), $event);
-        }
-
-        $subject = $event->getSubject();
-        $workflow = $event->getWorkflow();
-        $transition = $event->getTransition();
-
-        // Process Notifications;
-        foreach(array_get($workflow->getMetadataStore()->getWorkflowMetadata(), 'notifications', []) as $notification) {
-            $notifiables = ExpressionLanguage::evaluate($notification->notifiables, compact('subject'));
-            Notification::sendNow($notifiables, new $notification->name, $notification->channels);
-        }
-
-        // Transition Notifications
-        foreach(array_get($workflow->getMetadataStore()->getTransitionMetadata($transition), 'notifications', []) as $notification) {
-            $notifiables = ExpressionLanguage::evaluate($notification->notifiables, compact('subject'));
-            Notification::sendNow($notifiables, new $notification->name, $notification->channels);
-        }
-
-        foreach ($workflow->getEnabledTransitions($subject) as $transition) {
-            if (ExpressionLanguage::evaluate(array_get($workflow->getMetadataStore()->getTransitionMetadata($transition), 'automatic'), compact('subject')) === true) {
-                #TODO: 自动执行的时候，可能需要无视权限
-                $workflow->apply($subject, $transition->getName());
-                $subject->save();
-                break;
-            }
         }
     }
 
