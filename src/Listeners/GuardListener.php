@@ -28,23 +28,24 @@ class GuardListener
      */
     public function handle($event)
     {
-        $subject = $event->getSubject();
+        $subject    = $event->getSubject();
+        $workflow   = $event->getWorkflow();
+        $transition = $event->getTransition();
+        $metadata   = $workflow->getMetadataStore()->getTransitionMetadata($transition);
+        $guard      = array_get($metadata, 'guard');
 
-        if ($workflow = Workflow::whereName($event->getWorkflowName())->first()) {
-
-            $transition = $workflow->transitions()->whereName($event->getTransition()->getName())->first();
-
-            if ($event->getTransition()->getName() == 'start') {
-                return;
-            }
-
-            if (!empty($transition->guard) && ExpressionLanguage::evaluate($transition->guard, compact('subject')) !== false) {
-                $event->setBlocked(true);
-            }
-
-            if (!Bouncer::allows('apply', $transition)) {
-                $event->setBlocked(true);
-            }
+        # TODO: 一些自动化操作需要把权限处理掉
+        if ($event->getTransition()->getName() == 'start') {
+            return;
         }
+
+        if (!empty($guard) && ExpressionLanguage::evaluate($guard, compact('subject')) !== false) {
+            $event->setBlocked(true);
+        }
+
+        #TODO: 需要处理好与 Bouncer 的关系
+        //if (!Bouncer::allows('apply', $transition)) {
+        //    $event->setBlocked(true);
+        //}
     }
 }
