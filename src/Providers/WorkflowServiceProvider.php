@@ -97,7 +97,7 @@ class WorkflowServiceProvider extends ServiceProvider
      */
     public function registerViews()
     {
-        $viewPath = resource_path('views/modules/workflow');
+        $viewPath = resource_path('views/vendor/workflow');
 
         $sourcePath = __DIR__.'/../../resources/views';
 
@@ -106,7 +106,7 @@ class WorkflowServiceProvider extends ServiceProvider
         ]);
 
         $this->loadViewsFrom(array_merge(array_map(function ($path) {
-            return $path . '/modules/workflow';
+            return $path . '/vendor/workflow';
         }, \Config::get('view.paths')), [$sourcePath]), 'workflow');
     }
 

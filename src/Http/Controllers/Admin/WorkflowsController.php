@@ -2,17 +2,25 @@
 
 namespace Wuwx\LaravelWorkflow\Http\Controllers\Admin;
 
+use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use App\Http\Controllers\Admin\Controller;
+use Illuminate\Support\Facades\Gate;
 use Kris\LaravelFormBuilder\Facades\FormBuilder;
+use Wuwx\LaravelWorkflow\Http\Controllers\Controller;
 use Wuwx\LaravelWorkflow\Entities\Workflow;
 
 class WorkflowsController extends Controller
 {
-    public function __construct()
+    public function __construct(Request $request)
     {
-        $this->authorizeResource(Workflow::class);
+        $this->middleware(function ($request, Closure $next) {
+            if (Gate::allows('viewWorkflow')) {
+                return $next($request);
+            } else {
+                return abort(400);
+            }
+        });
     }
 
     public function index()
@@ -68,8 +76,9 @@ class WorkflowsController extends Controller
         }
     }
 
-    public function show(Workflow $workflow)
+    public function show($name)
     {
+        $workflow = app('workflow.registry')->get(app()->make("App\\Issue"), $name);
         return view('workflow::admin.workflows.show', compact('workflow'));
     }
 }
