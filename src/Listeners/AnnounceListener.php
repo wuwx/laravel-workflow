@@ -39,8 +39,8 @@ class AnnounceListener
 
         // Transition Notifications
         foreach(array_get($workflow->getMetadataStore()->getTransitionMetadata($transition), 'notifications', []) as $notification) {
-            $notifiables = ExpressionLanguage::evaluate($notification->notifiables, compact('subject'));
-            Notification::sendNow($notifiables, new $notification->name, $notification->channels);
+            $notifiables = ExpressionLanguage::evaluate(array_get($notification, "notifiables"), compact('subject'));
+            Notification::sendNow($notifiables, resolve(array_get($notification, "name")), array_get($notification, "channels"));
         }
 
         foreach ($workflow->getEnabledTransitions($subject) as $transition) {

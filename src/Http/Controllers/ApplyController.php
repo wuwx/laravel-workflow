@@ -37,12 +37,12 @@ class ApplyController extends Controller
 
             foreach(array_get($workflow->getMetadataStore()->getTransitionMetadata($transition), 'attributes', []) as $attribute) {
                 if (array_has($subject->getAttributes(), array_get($attribute, 'name'))) {
-                    if ($attribute->type == 'file') {
-                        if ($request->hasFile($attribute->name)) {
-                            $subject->{$attribute->name} = $request->file($attribute->name)->store('workflow', 'public');
+                    if (array_get($attribute, 'type') == 'file') {
+                        if ($request->hasFile(array_get($attribute, 'name'))) {
+                            $subject->{array_get($attribute, 'name')} = $request->file(array_get($attribute, 'name'))->store('workflow', 'public');
                         }
                     } else {
-                        $subject->{$attribute->name} = $request->input($attribute->name);
+                        $subject->{array_get($attribute, 'name')} = $request->input(array_get($attribute, 'name'));
                     }
                 }
             }
