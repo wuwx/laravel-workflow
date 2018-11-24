@@ -35,9 +35,6 @@ class AttributesController extends Controller
             }
         }
 
-        $subject = app()->make($subject_type)->find($subject_id);
-        //$subject = $subject->subjects()->first();
-
         $form = FormBuilder::plain();
         $current_user = $request->user();
         $attributes = array_get($workflow->getMetadataStore()->getTransitionMetadata($transition), 'attributes', []);

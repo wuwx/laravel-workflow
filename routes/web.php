@@ -6,6 +6,7 @@ Route::group(['middleware' => 'auth', 'prefix' => 'workflow', 'as' => 'workflow.
 
     Route::group(['namespace' => 'Api', 'prefix' => 'api', 'as' => 'api.'], function () {
         Route::resource('transitions', 'TransitionsController');
+        Route::resource('attributes', 'AttributeController');
         Route::resource('histories', 'HistoryController');
     });
     Route::group(['namespace' => 'Admin', 'prefix' => 'admin', 'as' => 'admin.'], function () {
