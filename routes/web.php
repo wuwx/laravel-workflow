@@ -5,6 +5,7 @@ Route::group(['middleware' => 'auth', 'prefix' => 'workflow', 'as' => 'workflow.
     Route::resource('transitions', 'TransitionsController');
 
     Route::group(['namespace' => 'Api', 'prefix' => 'api', 'as' => 'api.'], function () {
+        Route::resource('steps', 'StepController');
         Route::resource('transitions', 'TransitionsController');
         Route::resource('attributes', 'AttributeController');
         Route::resource('histories', 'HistoryController');
