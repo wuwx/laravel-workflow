@@ -4,8 +4,6 @@ namespace Wuwx\LaravelWorkflow\Listeners;
 
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Request;
 use Wuwx\LaravelWorkflow\Entities\Workflow;
 
 class EnteredListener
@@ -28,6 +26,7 @@ class EnteredListener
      */
     public function handle($event)
     {
+        $request    = app('request');
         $subject    = $event->getSubject();
         $workflow   = $event->getWorkflow();
         $transition = $event->getTransition();
@@ -37,9 +36,15 @@ class EnteredListener
         $history->transition_name = $transition->getName();
         $history->transition_froms = $transition->getFroms();
         $history->transition_tos = $transition->getTos();
+        $history->content = $request->input('content');
+        $history->user_id = $request->user()->id;
 
-        $history->content = Request::input('content');
-        $history->user_id = Auth::id();
+        $attributes = [];
+        foreach(array_get($workflow->getMetadataStore()->getTransitionMetadata($transition), 'attributes', []) as $attribute) {
+            $name = $attribute['name'];
+            $attributes[$name] = $request->input($name);
+        }
+        $history->attributes = $attributes;
 
         $history->save();
     }

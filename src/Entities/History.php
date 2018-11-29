@@ -12,6 +12,7 @@ class History extends Model
     protected $casts = [
         'transition_froms' => 'array',
         'transition_tos' => 'array',
+        'attributes' => 'json',
     ];
 
     public function subject()

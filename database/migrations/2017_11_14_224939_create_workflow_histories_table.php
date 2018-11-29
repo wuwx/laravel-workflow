@@ -22,6 +22,7 @@ class CreateWorkflowHistoriesTable extends Migration
             $table->string('transition_tos')->nullable();
             $table->integer('user_id')->nullable();
             $table->text('content')->nullable();
+            $table->json('attributes')->nullable();
             $table->timestamps();
         });
     }
