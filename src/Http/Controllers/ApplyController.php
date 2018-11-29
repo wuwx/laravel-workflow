@@ -38,7 +38,7 @@ class ApplyController extends Controller
 
             foreach(array_get($workflow->getMetadataStore()->getTransitionMetadata($transition), 'attributes', []) as $attribute) {
                 $options = ExpressionLanguage::evaluate(array_get($attribute, 'options'), compact('subject', 'current_user'));
-                $request->validate([$attribute['name'] => array_get($options, 'rules')]);
+                $request->validate([$attribute['name'] => array_get($options, 'rules', [])]);
 
                 if (array_has($subject->getAttributes(), array_get($attribute, 'name'))) {
                     if (array_get($attribute, 'type') == 'file') {
