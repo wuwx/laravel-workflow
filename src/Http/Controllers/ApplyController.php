@@ -2,10 +2,11 @@
 
 namespace Wuwx\LaravelWorkflow\Http\Controllers;
 
+use ExpressionLanguage;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
-
+use Illuminate\Support\Facades\DB;
 use Wuwx\LaravelWorkflow\Facades\RegistryFacade as Workflow;
 use Wuwx\LaravelWorkflow\Entities\Transition;
 
@@ -13,7 +14,7 @@ class ApplyController extends Controller
 {
     public function __invoke(Request $request)
     {
-        #TODO: 最好放在一个事务里，否则有问题
+        $current_user   = $request->user();
         $subject_id     = $request->subject_id;
         $subject_type   = $request->subject_type;
         $workflow_name  = $request->workflow_name;
@@ -25,9 +26,7 @@ class ApplyController extends Controller
         $workflow = app('workflow.registry')->get($subject, $workflow_name);
 
         try {
-            #TODO: 应该先保存属性再保存工作流
-            $workflow->apply($subject, $transitionName);
-            $subject->save();
+            DB::beginTransaction();
 
             foreach($workflow->getDefinition()->getTransitions() as $transition) {
                 if ($transition->getName() == $transitionName) {
@@ -35,7 +34,12 @@ class ApplyController extends Controller
                 }
             }
 
+            $workflow->apply($subject, $transitionName);
+
             foreach(array_get($workflow->getMetadataStore()->getTransitionMetadata($transition), 'attributes', []) as $attribute) {
+                $options = ExpressionLanguage::evaluate(array_get($attribute, 'options'), compact('subject', 'current_user'));
+                $request->validate([$attribute['name'] => array_get($options, 'rules')]);
+
                 if (array_has($subject->getAttributes(), array_get($attribute, 'name'))) {
                     if (array_get($attribute, 'type') == 'file') {
                         if ($request->hasFile(array_get($attribute, 'name'))) {
@@ -47,6 +51,8 @@ class ApplyController extends Controller
                 }
             }
             $subject->save();
+
+            DB::commit();
 
         } catch (\Symfony\Component\Workflow\Exception\InvalidArgumentException $exception) {
 
