@@ -1,8 +1,12 @@
 <template>
-    <div>
-        <h3>Histories</h3>
-        <div v-for="history in histories">
-            {{ history.created_at }}
+    <div class="card mb-3">
+        <div class="card-header">
+            流程历史
+        </div>
+        <div class="card-body">
+            <div v-for="history in histories">
+                {{ history.created_at }}
+            </div>
         </div>
     </div>
 </template>
