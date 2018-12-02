@@ -36,8 +36,7 @@ class EnteredListener
         $history->transition_name = $transition->getName();
         $history->transition_froms = $transition->getFroms();
         $history->transition_tos = $transition->getTos();
-        $history->content = $request->input('content');
-        $history->user_id = $request->user()->id;
+        $history->user()->associate($request->user());
 
         $attributes = [];
         foreach(array_get($workflow->getMetadataStore()->getTransitionMetadata($transition), 'attributes', []) as $attribute) {
