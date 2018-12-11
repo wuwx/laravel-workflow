@@ -37,7 +37,7 @@
                     <a href="{{ route('workflow.admin.workflows.show', $workflow) }}">{{ $workflow->title }}</a>
                 </td>
                 <td>
-                    <a href="{{ route('workflow.admin.workflows.show', ['workflow' => $workflow, '_format' => 'png']) }}" class="btn btn-default btn-sm">PNG</a>
+                    <a href="{{ route('workflow.admin.workflows.show', ['workflow' => $workflow->name, '_format' => 'png']) }}" class="btn btn-default btn-sm">PNG</a>
                 </td>
                 <td>
                     <a href="{{ route('workflow.admin.workflows.edit', $workflow) }}" class="btn btn-default btn-sm">编辑</a>
