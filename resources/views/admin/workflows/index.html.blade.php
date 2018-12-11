@@ -34,7 +34,7 @@
                 <td>#{{ $workflow->id }}</td>
                 <td>{{ $workflow->name }}</td>
                 <td>
-                    <a href="{{ route('workflow.admin.workflows.show', $workflow) }}">{{ $workflow->title }}</a>
+                    <a href="{{ route('workflow.admin.workflows.show', $workflow->name) }}">{{ $workflow->title }}</a>
                 </td>
                 <td>
                     <a href="{{ route('workflow.admin.workflows.show', ['workflow' => $workflow->name, '_format' => 'png']) }}" class="btn btn-default btn-sm">PNG</a>
