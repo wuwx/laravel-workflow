@@ -21,9 +21,10 @@ class TransitionsController extends Controller
         $this->authorizeResource(Transition::class);
     }
 
-    public function index(Workflow $workflow)
+    public function index($name)
     {
-        $transitions = $workflow->transitions;
+        $workflow = app('workflow.registry')->get(app()->make("App\\Issue"), $name);
+        $transitions = $workflow->getDefinition()->getTransitions();
         return view('workflow::admin.transitions.index', compact('workflow', 'transitions'));
     }
 

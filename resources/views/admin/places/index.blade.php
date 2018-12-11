@@ -7,7 +7,7 @@
             Places
         </div>
         <div class="box-tools">
-            <a href="{{ route('workflow.admin.workflows.places.create', [$workflow]) }}" class="btn btn-default btn-sm">新建</a>
+            <a href="{{ route('workflow.admin.workflows.places.create', [$workflow->getName()]) }}" class="btn btn-default btn-sm">新建</a>
         </div>
     </div>
     <div class="box-body">
@@ -25,13 +25,13 @@
             <tbody>
                 @foreach($places as $place)
                 <tr>
-                    <td>{{ $place->name }}</td>
-                    <td>{{ $place->title }}</td>
-                    <td>{{ $place->description }}</td>
-                    <td class="icon">@fa('{{ $place->icon }} bg-{{ $place->color }}')</td>
-                    <td>{{ $place->attributes()->count() }}</td>
+                    <td>{{ $place }}</td>
+                    <td>{{ array_get($workflow->getMetadataStore()->getPlaceMetadata($place), 'title') }}</td>
+                    <td>{{ array_get($workflow->getMetadataStore()->getPlaceMetadata($place), 'description') }}</td>
+                    <td class="icon">@fa('{{ @$workflow->getMetadataStore()->getPlaceMetadata($place)["icon"] }} bg-{{ @$workflow->getMetadataStore()->getPlaceMetadata($place)["color"] }}')</td>
+                    <td>{{ count(array_get($workflow->getMetadataStore()->getPlaceMetadata($place), "attributes", [])) }}</td>
                     <td>
-                        <a href="{{ route('workflow.admin.workflows.places.edit', [$workflow, $place]) }}" class="btn btn-default btn-sm">编辑</a>
+                        <a href="{{ route('workflow.admin.workflows.places.edit', [$workflow->getName(), $place]) }}" class="btn btn-default btn-sm">编辑</a>
                     </td>
                 </tr>
                 @endforeach

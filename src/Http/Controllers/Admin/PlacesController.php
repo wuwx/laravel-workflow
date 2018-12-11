@@ -18,9 +18,10 @@ class PlacesController extends Controller
         $this->authorizeResource(Place::class);
     }
 
-    public function index(Workflow $workflow)
+    public function index($name)
     {
-        $places = $workflow->places;
+        $workflow = app('workflow.registry')->get(app()->make("App\\Issue"), $name);
+        $places = $workflow->getDefinition()->getPlaces();
         return view('workflow::admin.places.index', compact('workflow', 'places'));
     }
 

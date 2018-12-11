@@ -7,7 +7,7 @@
             迁移
         </div>
         <div class="box-tools">
-            <a href="{{ route('workflow.admin.workflows.transitions.create', [$workflow]) }}" class="btn btn-default btn-sm">新建</a>
+            <a href="{{ route('workflow.admin.workflows.transitions.create', [$workflow->getName()]) }}" class="btn btn-default btn-sm">新建</a>
         </div>
     </div>
     <div class="box-body">
@@ -25,13 +25,13 @@
             <tbody>
                 @foreach($transitions as $transition)
                 <tr>
-                    <td>{{ $transition->name }}</td>
-                    <td>{{ $transition->title }}</td>
-                    <td>{{ $transition->description }}</td>
-                    <td width="120">{{ Wuwx\LaravelWorkflow\Entities\Place::whereIn('name', $transition->froms)->pluck('title')->implode(", ") }}</td>
-                    <td width="120">{{ Wuwx\LaravelWorkflow\Entities\Place::whereIn('name', $transition->tos)->pluck('title')->implode(", ") }}</td>
+                    <td>{{ $transition->getName() }}</td>
+                    <td>{{ array_get($workflow->getMetadataStore()->getTransitionMetadata($transition), 'title') }}</td>
+                    <td>{{ array_get($workflow->getMetadataStore()->getTransitionMetadata($transition), 'description') }}</td>
+                    <td width="120">{{-- Wuwx\LaravelWorkflow\Entities\Place::whereIn('name', $transition->froms)->pluck('title')->implode(", ") --}}</td>
+                    <td width="120">{{-- Wuwx\LaravelWorkflow\Entities\Place::whereIn('name', $transition->tos)->pluck('title')->implode(", ") --}}</td>
                     <td width="10">
-                        <a href="{{ route('workflow.admin.workflows.transitions.edit', [$workflow, $transition]) }}" class="btn btn-default btn-sm">编辑</a>
+                        <a href="{{ route('workflow.admin.workflows.transitions.edit', [$workflow->getName(), $transition->getName()]) }}" class="btn btn-default btn-sm">编辑</a>
                     </td>
                 </tr>
                 @endforeach

@@ -20,7 +20,7 @@ class SubjectsController extends Controller
      * Display a listing of the resource.
      * @return Response
      */
-    public function index(Workflow $workflow, Version $version, Process $process)
+    public function index($name, Version $version, Process $process)
     {
         $subjects = $process->subjects()->paginate();
         return view('workflow::admin.subjects.index', compact('workflow', 'version', 'process', 'subjects'));
