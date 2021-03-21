@@ -2,16 +2,27 @@
 
 namespace Wuwx\LaravelWorkflow\Providers;
 
-use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Gate;
 
 use App\User;
+use Livewire\Livewire;
 use Wuwx\LaravelWorkflow\Factories\RegistryFactory;
+use Wuwx\LaravelWorkflow\Http\Livewire\Workflow;
 
 class WorkflowServiceProvider extends ServiceProvider
 {
+    /**
+     * @var string $moduleName
+     */
+    protected $moduleName = 'Workflow';
+
+    /**
+     * @var string $moduleNameLower
+     */
+    protected $moduleNameLower = 'workflow';
+
     /**
      * Indicates if loading of the provider is deferred.
      *
@@ -26,9 +37,9 @@ class WorkflowServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        $this->registerTranslations();
         $this->registerConfig();
         $this->registerViews();
-        $this->registerFactories();
         $this->loadMigrationsFrom(__DIR__ . '/../../database/migrations');
         if ($this->app['config']->get('workflow.debug') || true) {
             $this->app->register(RouteServiceProvider::class);
@@ -73,6 +84,8 @@ class WorkflowServiceProvider extends ServiceProvider
                 }
             }
         });
+
+        Livewire::component('workflow', Workflow::class);
     }
 
     /**
@@ -111,13 +124,18 @@ class WorkflowServiceProvider extends ServiceProvider
     }
 
     /**
-     * Register an additional directory of factories.
-     * @source https://github.com/sebastiaanluca/laravel-resource-flow/blob/develop/src/Modules/ModuleServiceProvider.php#L66
+     * Register translations.
+     *
+     * @return void
      */
-    public function registerFactories()
+    public function registerTranslations()
     {
-        if (! app()->environment('production')) {
-            app(Factory::class)->load(__DIR__ . '/../../database/factories');
+        $langPath = resource_path('lang/modules/' . $this->moduleNameLower);
+
+        if (is_dir($langPath)) {
+            $this->loadTranslationsFrom($langPath, $this->moduleNameLower);
+        } else {
+            $this->loadTranslationsFrom(module_path($this->moduleName, 'Resources/lang'), $this->moduleNameLower);
         }
     }
 }
