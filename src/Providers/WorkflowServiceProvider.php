@@ -2,10 +2,10 @@
 
 namespace Wuwx\LaravelWorkflow\Providers;
 
+use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Database\Eloquent\Factory;
 
 use App\User;
 use Wuwx\LaravelWorkflow\Factories\RegistryFactory;
