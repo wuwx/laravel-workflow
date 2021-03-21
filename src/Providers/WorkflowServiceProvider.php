@@ -37,7 +37,6 @@ class WorkflowServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $this->registerTranslations();
         $this->registerConfig();
         $this->registerViews();
         $this->loadMigrationsFrom(__DIR__ . '/../../database/migrations');
@@ -121,21 +120,5 @@ class WorkflowServiceProvider extends ServiceProvider
         $this->loadViewsFrom(array_merge(array_map(function ($path) {
             return $path . '/vendor/workflow';
         }, \Config::get('view.paths')), [$sourcePath]), 'workflow');
-    }
-
-    /**
-     * Register translations.
-     *
-     * @return void
-     */
-    public function registerTranslations()
-    {
-        $langPath = resource_path('lang/modules/' . $this->moduleNameLower);
-
-        if (is_dir($langPath)) {
-            $this->loadTranslationsFrom($langPath, $this->moduleNameLower);
-        } else {
-            $this->loadTranslationsFrom(module_path($this->moduleName, 'Resources/lang'), $this->moduleNameLower);
-        }
     }
 }
