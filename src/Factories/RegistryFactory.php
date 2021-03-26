@@ -4,11 +4,10 @@ namespace Wuwx\LaravelWorkflow\Factories;
 use Illuminate\Database\Eloquent\Model;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\Workflow\MarkingStore\MethodMarkingStore;
 use Symfony\Component\Workflow\Registry;
 use Symfony\Component\Workflow\Definition;
 use Symfony\Component\Workflow\DefinitionBuilder;
-use Symfony\Component\Workflow\MarkingStore\SingleStateMarkingStore;
-use Symfony\Component\Workflow\MarkingStore\MultipleStateMarkingStore;
 use Symfony\Component\Workflow\Metadata\InMemoryMetadataStore;
 use Symfony\Component\Workflow\SupportStrategy\InstanceOfSupportStrategy;
 use Wuwx\LaravelWorkflow\Entities;
@@ -96,14 +95,8 @@ class RegistryFactory
             $definition = $builder->build();
             $markingStoreArguments = array_get($workflow, 'marking_store.arguments', []);
             switch (array_get($workflow, 'marking_store.type')) {
-                case 'multiple_state':
-                    $markingStore = new MultipleStateMarkingStore(...$markingStoreArguments);
-                    break;
-                case 'single_state':
-                    $markingStore = new SingleStateMarkingStore(...$markingStoreArguments);
-                    break;
                 default:
-                    $markingStore = new SingleStateMarkingStore(...$markingStoreArguments);
+                    $markingStore = new MethodMarkingStore(...$markingStoreArguments);
                     break;
             }
 

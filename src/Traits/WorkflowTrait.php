@@ -49,4 +49,14 @@ trait WorkflowTrait
     {
         $this->workflow_marking = $value;
     }
+
+    public function getMarking()
+    {
+        return $this->workflow_marking;
+    }
+
+    public function setMarking($value)
+    {
+        $this->workflow_marking = $value;
+    }
 }

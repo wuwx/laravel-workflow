@@ -21,11 +21,11 @@ class EventServiceProvider extends ServiceProvider
      * @var array
      */
     protected $listen = [
-        "workflow.guard"      => [GuardListener::class],
+        //"workflow.guard"      => [GuardListener::class],
         'workflow.leave'      => [LeaveListener::class],
         'workflow.transition' => [TransitionListener::class],
         'workflow.enter'      => [EnterListener::class],
-        'workflow.entered'    => [EnteredListener::class],
+        //'workflow.entered'    => [EnteredListener::class],
         'workflow.completed'  => [CompletedListener::class],
         'workflow.announce'   => [AnnounceListener::class],
     ];

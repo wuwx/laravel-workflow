@@ -68,7 +68,7 @@ class WorkflowSubscriber implements EventSubscriberInterface
 
     public function onEntered($event)
     {
-        $places       = $event->getTransition()->getTos();
+        $places       = $event->getMarking()->getPlaces();
         $workflowName = $event->getWorkflowName();
 
         event(new EnteredEvent($event));
