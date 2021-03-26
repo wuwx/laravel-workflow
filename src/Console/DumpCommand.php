@@ -3,40 +3,50 @@
 namespace Wuwx\LaravelWorkflow\Console;
 
 use Illuminate\Console\Command;
+use Symfony\Component\Console\Input\InputArgument;
 
 class DumpCommand extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
-    protected $signature = 'workflow:dump';
-
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
+    protected $name = 'workflow:dump';
     protected $description = 'Command description';
 
-    /**
-     * Create a new command instance.
-     *
-     * @return void
-     */
     public function __construct()
     {
         parent::__construct();
     }
 
-    /**
-     * Execute the console command.
-     *
-     * @return mixed
-     */
     public function handle()
     {
-        app('workflow.registry');
+        $name = $this->argument('name');
+        $registry = app('workflow.registry');
+
+        $workflows = (function(){
+            return $this->workflows;
+        })->call($registry);
+
+        foreach($workflows as list($workflow, $supportStrategy)) {
+            if ($workflow->getName() == $name) {
+                $graph = new Alom\Graphviz\Digraph('G');
+                foreach($workflow->places as $place) {
+                    $graph->node($place->name, ['label' => $place->title]);
+                }
+                foreach($workflow->transitions as $transition) {
+                    $graph->edge([$transition->froms, $transition->tos], ['label' => $transition->title]);
+                }
+
+                $process = new Symfony\Component\Process\Process("dot -Tpng");
+                $process->setInput($graph->render());
+                $process->run();
+                echo $process->getOutput();
+                break;
+            }
+        }
+    }
+
+    protected function getArguments()
+    {
+        return [
+            ['name', InputArgument::REQUIRED, ''],
+        ];
     }
 }
