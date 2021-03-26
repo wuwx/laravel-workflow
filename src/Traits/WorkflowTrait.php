@@ -8,7 +8,7 @@ use Wuwx\LaravelWorkflow\Entities\Workflow;
 use Wuwx\LaravelWorkflow\Entities\Process;
 use Wuwx\LaravelWorkflow\Entities\Subject;
 use Wuwx\LaravelWorkflow\Entities\Place;
-use Wuwx\LaravelWorkflow\Entities\History;
+use Wuwx\LaravelWorkflow\Models\History;
 
 trait WorkflowTrait
 {
@@ -35,7 +35,7 @@ trait WorkflowTrait
         return $this->morphMany(Subject::class, 'entity');
     }
 
-    public function histories()
+    public function workflowHistories()
     {
         return $this->morphMany(History::class, 'subject');
     }

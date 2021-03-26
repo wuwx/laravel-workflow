@@ -1,6 +1,6 @@
 <?php
 
-namespace Wuwx\LaravelWorkflow\Entities;
+namespace Wuwx\LaravelWorkflow\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use App\User;
@@ -17,7 +17,7 @@ class History extends Model
 
     public function subject()
     {
-        return $this->belongsTo(Subject::class);
+        return $this->morphTo();
     }
 
     public function transition()

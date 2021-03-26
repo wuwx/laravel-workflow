@@ -1,21 +1,18 @@
 <?php
 
-namespace Wuwx\LaravelWorkflow\Entities;
+namespace Wuwx\LaravelWorkflow\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Symfony\Component\Workflow\SupportStrategy\SupportStrategyInterface;
 use Symfony\Component\Workflow\Workflow;
 use Carbon\Carbon;
+use Wuwx\LaravelWorkflow\Traits\WorkflowTrait;
 
-class Subject extends Model implements SupportStrategyInterface
+class Subject extends Model
 {
+    use WorkflowTrait;
+
     protected $table = "workflow_subjects";
     protected $fillable = ['process_id'];
-
-    public function supports(Workflow $workflow, $subject)
-    {
-        return $subject instanceof self;
-    }
 
     protected static function boot()
     {
