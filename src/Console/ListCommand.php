@@ -26,13 +26,13 @@ class ListCommand extends Command
             return $this->workflows;
         })->call($registry);
 
-        $this->table(['name', 'title', 'supportStrategy', 'initial_place'], array_map(function($value) {
+        $this->table(['name', 'title', 'supportStrategy', 'initial_places'], array_map(function($value) {
             list($workflow, $supportStrategy) = $value;
             return [
                 $workflow->getName(),
                 array_get($workflow->getMetadataStore()->getWorkflowMetadata(), 'title'),
                 $supportStrategy->getClassName(),
-                $workflow->getDefinition()->getInitialPlace(),
+                json_encode($workflow->getDefinition()->getInitialPlaces()),
             ];
         }, $workflows));
     }
